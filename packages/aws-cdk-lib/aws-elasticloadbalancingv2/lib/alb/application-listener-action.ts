@@ -5,6 +5,7 @@ import { Port } from '../../../aws-ec2';
 import { Duration, SecretValue, Tokenization } from '../../../core';
 import { CfnListener, CfnListenerRule } from '../elasticloadbalancingv2.generated';
 import { IListenerAction } from '../shared/listener-action';
+import { ApplicationProtocol } from '../shared/enums';
 
 /**
  * What to do when a client makes a request to a listener
@@ -112,7 +113,7 @@ export class ListenerAction implements IListenerAction {
    * @see https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html#redirect-actions
    */
   public static redirect(options: RedirectOptions): ListenerAction {
-    if ([options.host, options.path, options.port, options.protocol, options.query].findIndex(x => x !== undefined) === -1) {
+    if (Object.keys(options).every(k => options[k] === undefined)) {
       throw new Error('To prevent redirect loops, set at least one of \'protocol\', \'host\', \'port\', \'path\', or \'query\'.');
     }
 
@@ -302,7 +303,7 @@ export interface RedirectOptions {
    *
    * @default - No change
    */
-  readonly port?: string;
+  readonly port?: number;
 
   /**
    * The protocol.
@@ -311,7 +312,7 @@ export interface RedirectOptions {
    *
    * @default - No change
    */
-  readonly protocol?: string;
+  readonly protocol?: ApplicationProtocol;
 
   /**
    * The query parameters, URL-encoded when necessary, but not percent-encoded.
